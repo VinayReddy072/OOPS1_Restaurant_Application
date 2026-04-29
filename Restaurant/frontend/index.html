@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java Bistro</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-inner">
+            <a onclick="navigate('home')" class="logo">Java<span>Bistro</span></a>
+            <div class="nav-links">
+                <a onclick="navigate('home')" id="nav-home" class="active">Home</a>
+                <a onclick="navigate('menu')" id="nav-menu">Menu</a>
+                <a onclick="navigate('orders')" id="nav-orders">Orders</a>
+            </div>
+            <button onclick="navigate('menu')" class="btn btn-primary">Order Now</button>
+        </div>
+    </nav>
+
+    <main class="section">
+
+        <!-- VIEW: HOME -->
+        <div id="view-home" class="view">
+            <div class="hero-grid">
+                <div class="hero-text">
+                    <p class="tagline">POWERED BY JAVA 21 + HTTP SERVER</p>
+                    <h1>Taste the <br><span class="gradient-text">Full Spectrum.</span></h1>
+                    <p class="hero-subtitle">
+                        Experience object-oriented dining in a clean, modern interface. 
+                        <span class="highlight-green">Fresh</span> ingredients, 
+                        <span class="highlight-orange">Hot</span> flavors, and 
+                        <span class="highlight-blue">Ready</span> whenever you are.
+                    </p>
+                    <div class="btn-group">
+                        <button onclick="navigate('menu')" class="btn btn-primary">View Menu</button>
+                        <button onclick="navigate('orders')" class="btn btn-ghost">Track Order</button>
+                    </div>
+                </div>
+                <div class="hero-img">
+                    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Delicious Food">
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: MENU -->
+        <div id="view-menu" class="view hidden">
+            <div class="section-header">
+                <h2>Our Menu</h2>
+                <p>Select a category to filter dishes.</p>
+            </div>
+            
+            <div class="filter-bar">
+                <button class="filter-btn active" data-type="ALL" onclick="filterMenu('ALL')">All</button>
+                <button class="filter-btn" data-type="BREAKFAST" onclick="filterMenu('BREAKFAST')">Breakfast</button>
+                <button class="filter-btn" data-type="LUNCH" onclick="filterMenu('LUNCH')">Lunch</button>
+                <button class="filter-btn" data-type="DINNER" onclick="filterMenu('DINNER')">Dinner</button>
+                <button class="filter-btn" data-type="LATE_NIGHT" onclick="filterMenu('LATE_NIGHT')">Late Night</button>
+            </div>
+
+            <div id="menu-grid" class="menu-grid">
+                <!-- Items injected by JS -->
+            </div>
+        </div>
+
+        <!-- VIEW: ORDERS -->
+        <div id="view-orders" class="view hidden">
+            <div class="orders-header">
+                <h2>Order Live Feed</h2>
+                <button class="btn btn-ghost" onclick="fetchOrders()">
+                    Refresh Data
+                </button>
+            </div>
+            
+            <div class="table-container">
+                <table id="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Dish & Qty</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-body">
+                        <!-- Rows injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- VIEW: RECEIPT (NEW) -->
+        <div id="view-receipt" class="view hidden receipt-view-container">
+            <div class="receipt-paper">
+                <div class="receipt-header">
+                    <h2 style="margin-bottom: 5px;">Java Bistro</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Order Confirmation</p>
+                    <div class="dashed-line"></div>
+                </div>
+                
+                <div id="receipt-content">
+                    <!-- Content Injected by JS -->
+                </div>
+
+                <div class="dashed-line"></div>
+                
+                <div class="receipt-total-row">
+                    <span>TOTAL PAID</span>
+                    <span id="receipt-final-total" class="highlight-green">$0.00</span>
+                </div>
+
+                <div class="receipt-footer">
+                    <p>Thank you for dining with us!</p>
+                    <div class="btn-group-center">
+                        <button class="btn btn-primary" onclick="navigate('home')">Done</button>
+                        <button class="btn btn-ghost" onclick="navigate('orders')">Track Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 Java Bistro. <br> 
+        <span class="dev-name">Backend: Java 21 | Frontend: Vanilla JS</span><br>
+        <span class="dev-name">@ Vinay Reddy Talla</span>
+        </p>
+    </footer>
+
+    <!-- MODAL -->
+    <div id="order-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Place Order</h2>
+                <p>Ordering: <strong id="modal-dish-display" class="highlight-orange"></strong></p>
+            </div>
+            
+            <div class="form-group">
+                <label>Your Name</label>
+                <input type="text" id="input-customer" placeholder="e.g. Alice">
+            </div>
+            <div class="form-group">
+                <label>Quantity</label>
+                <input type="number" id="input-qty" value="1" min="1" max="10">
+            </div>
+            <div class="form-group">
+                <label>Promo Code (Optional)</label>
+                <input type="text" id="input-promo" placeholder="VIP / STUDENT / SENIOR">
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-primary full-width" onclick="submitOrder()">Confirm Order</button>
+                <button class="btn btn-red full-width" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
